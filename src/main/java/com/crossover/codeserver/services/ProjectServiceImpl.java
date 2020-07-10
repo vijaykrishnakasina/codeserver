@@ -1,10 +1,7 @@
 package com.crossover.codeserver.services;
 
-import java.io.File;
 import java.lang.reflect.Field;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +11,8 @@ import com.crossover.codeserver.dto.ProjectDto;
 import com.crossover.codeserver.dto.SdlcSystemDto;
 import com.crossover.codeserver.entities.Project;
 import com.crossover.codeserver.entities.SdlcSystem;
+import com.crossover.codeserver.exception.ProjectNotFoundException;
+import com.crossover.codeserver.exception.SystemNotFoundException;
 import com.crossover.codeserver.repositories.ProjectRepository;
 import com.crossover.codeserver.repositories.SdlcSystemRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,13 +46,14 @@ public class ProjectServiceImpl implements ProjectService {
 	@Override
 	public ProjectDto createProject(ProjectDto projectDto) {
 		Project project = convertProjectDtoToProject(projectDto);
+		sdlcSystemRepository.findById(project.getSdlcSystem().getId()).orElseThrow(() -> new SystemNotFoundException(project.getSdlcSystem().getId()));
 		return convertProjectToProjectDto(projectRepository.save(project));
 	}
 	
 	@Override
 	public ProjectDto patchProject(long project_id, Map<Object, Object> projectDtoFields) {
 		
-		Project exising_project = projectRepository.findById(project_id).orElseThrow(RuntimeException::new);
+		Project exising_project = projectRepository.findById(project_id).orElseThrow(() -> new ProjectNotFoundException(project_id));
 		projectDtoFields.forEach((k,v)->{
 			Field field = ReflectionUtils.findField(Project.class,(String) k);
 			if (v instanceof String) {
@@ -63,7 +63,7 @@ public class ProjectServiceImpl implements ProjectService {
 				ReflectionUtils.setField(field, exising_project, mappper.convertValue(v, field.getType()));
 			}
 		});
-		
+		//sdlcSystemRepository.findById(project.getSdlcSystem().getId()).orElseThrow(() -> new SystemNotFoundException(project.getSdlcSystem().getId()));
 		return convertProjectToProjectDto(exising_project);
 	}
 	

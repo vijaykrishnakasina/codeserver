@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,10 +51,9 @@ public class ProjectRestController {
 	}
 	
 	@ApiOperation("Insert a Project")
-	@PostMapping
+	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ProjectDto> createProject(@Valid @RequestBody ProjectDto project) {
-		
-		
 		
 		ProjectDto projectDto =  projectService.createProject(project);
 		
@@ -69,7 +69,7 @@ public class ProjectRestController {
 	
 	@ApiOperation("Update a Project")
 	@PatchMapping(ENDPOINT_ID)
-	public ResponseEntity<ProjectDto> patchProject(@PathVariable(PATH_VARIABLE_ID)
+	public ResponseEntity<Object> patchProject(@PathVariable(PATH_VARIABLE_ID)
 		final long projectId , @RequestBody Map<Object, Object> project) {
 		
 		
@@ -82,7 +82,8 @@ public class ProjectRestController {
                 .buildAndExpand(projectDto.getId())
                 .toUri();
 		
-		return ResponseEntity.created(location).body(projectDto);
+		//return ResponseEntity.created(location).body(projectDto);
+		return new ResponseEntity<>(projectDto, HttpStatus.OK);
 		
 	}
 }
