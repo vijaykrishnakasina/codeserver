@@ -1,6 +1,8 @@
 package com.crossover.codeserver.services;
 
+import java.io.File;
 import java.lang.reflect.Field;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -14,6 +16,7 @@ import com.crossover.codeserver.entities.Project;
 import com.crossover.codeserver.entities.SdlcSystem;
 import com.crossover.codeserver.repositories.ProjectRepository;
 import com.crossover.codeserver.repositories.SdlcSystemRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +29,8 @@ public class ProjectServiceImpl implements ProjectService {
 	
 	@Autowired
 	private SdlcSystemRepository sdlcSystemRepository;
+	
+	final ObjectMapper mappper = new ObjectMapper();
 
 	public ProjectDto getProject(long id) {
 		Project project =  projectRepository.findById(id).orElseThrow(RuntimeException::new);
@@ -33,7 +38,6 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 	
 	
-
 	/**
 	 * inserts project details into the database. 
 	 * If incoming SDLC system is not present in the database, we will insert that SDLC system. 
@@ -52,12 +56,12 @@ public class ProjectServiceImpl implements ProjectService {
 		Project exising_project = projectRepository.findById(project_id).orElseThrow(RuntimeException::new);
 		projectDtoFields.forEach((k,v)->{
 			Field field = ReflectionUtils.findField(Project.class,(String) k);
-			if (k.equals("sdlcSystem")) {
-				exising_project.getSdlcSystem().setId(Long.valueOf((int)((Map)v).get("id")));
-			}else {
+			if (v instanceof String) {
 				ReflectionUtils.setField(field, exising_project, v);
+			}else {
+				
+				ReflectionUtils.setField(field, exising_project, mappper.convertValue(v, field.getType()));
 			}
-			
 		});
 		
 		return convertProjectToProjectDto(exising_project);
