@@ -44,11 +44,6 @@ public class SdlcSystemRestController {
                 .orElseGet(() -> ResponseEntity.ok().build());
     }
 
-    @ApiOperation("Create a Project")
-    @PostMapping(value = "/api/v1/sdlc-systems/{systemId}/projects")
-    public Project createProject(@PathVariable(value = "systemId") Long systemId, @Valid @RequestBody ProjectDto project) {
-    	return projectService.createProject(systemId,project);
-    }
 
 //    @ApiOperation("Update a Project")
 //    @PutMapping("/api/v1/sdlc-systems/{systemId}/projects/{id}")
@@ -69,7 +64,8 @@ public class SdlcSystemRestController {
     @ApiOperation("Update a Project")
     @PutMapping("/api/v1/sdlc-systems/{systemId}/projects/{id}")
     public Project updateProject(@PathVariable(value = "id") Long projectId, @Valid @RequestBody ProjectDto projectDetails){
-    	return projectService.updateProject(projectId, projectDetails);
+//    	return projectService.updateProject(projectId, projectDetails);
+    	return null;
     }
     
     

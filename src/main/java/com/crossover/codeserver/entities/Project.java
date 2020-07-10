@@ -7,6 +7,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,6 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -32,29 +34,30 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
     @Column(name = "external_id", nullable = false)
-    @NotBlank
-    private String externalId;
+    @NotNull
+    public String externalId;
 
     @Column(name = "name")
-    private String name;
+    public String name;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "sdlc_system_id")
     @NotNull
-    private SdlcSystem sdlcSystem;
+    public SdlcSystem sdlcSystem;
     
     @Column(name = "created_date", nullable = false)
     @CreatedDate
-    private Instant createdDate;
+    public Instant createdDate;
 
     @Column(name = "last_modified_date", nullable = false)
     @LastModifiedDate
-    private Instant lastModifiedDate;
+    public Instant lastModifiedDate;
 }

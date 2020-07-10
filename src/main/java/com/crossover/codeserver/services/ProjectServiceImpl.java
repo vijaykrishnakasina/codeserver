@@ -1,11 +1,15 @@
 package com.crossover.codeserver.services;
 
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
 
 import com.crossover.codeserver.dto.ProjectDto;
+import com.crossover.codeserver.dto.SdlcSystemDto;
 import com.crossover.codeserver.entities.Project;
 import com.crossover.codeserver.entities.SdlcSystem;
 import com.crossover.codeserver.repositories.ProjectRepository;
@@ -17,39 +21,78 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
 
-	private final ProjectRepository projectRepository;
+	@Autowired
+	private ProjectRepository projectRepository;
 	
 	@Autowired
 	private SdlcSystemRepository sdlcSystemRepository;
 
-	public Project getProject(long id) {
-		return projectRepository.findById(id).get();
+	public ProjectDto getProject(long id) {
+		Project project =  projectRepository.findById(id).orElseThrow(RuntimeException::new);
+		return convertProjectToProjectDto(project);
 	}
 	
-	public Project createProject( Long systemId,ProjectDto projectDto) {
 	
-		Project project = Project.builder().externalId(projectDto.getExternalId()).name(projectDto.getName())
+
+	/**
+	 * inserts project details into the database. 
+	 * If incoming SDLC system is not present in the database, we will insert that SDLC system. 
+	 * if SDLC system id is already present, we will not insert / update
+	 */
+	
+	@Override
+	public ProjectDto createProject(ProjectDto projectDto) {
+		Project project = convertProjectDtoToProject(projectDto);
+		return convertProjectToProjectDto(projectRepository.save(project));
+	}
+	
+	@Override
+	public ProjectDto patchProject(long project_id, Map<Object, Object> projectDtoFields) {
+		
+		Project exising_project = projectRepository.findById(project_id).orElseThrow(RuntimeException::new);
+		projectDtoFields.forEach((k,v)->{
+			Field field = ReflectionUtils.findField(Project.class,(String) k);
+			if (k.equals("sdlcSystem")) {
+				exising_project.getSdlcSystem().setId(Long.valueOf((int)((Map)v).get("id")));
+			}else {
+				ReflectionUtils.setField(field, exising_project, v);
+			}
+			
+		});
+		
+		return convertProjectToProjectDto(exising_project);
+	}
+	
+	
+	
+	//TODO: NPE
+	private Project convertProjectDtoToProject(ProjectDto projectDto) {
+		return Project.builder().externalId(projectDto.getExternalId()).name(projectDto.getName())
 				.createdDate(projectDto.getCreatedDate()).lastModifiedDate(projectDto.getLastModifiedDate())
-				.sdlcSystem(buildSdlcSystem(projectDto)).build();
-		sdlcSystemRepository.findById(systemId).ifPresent(project::setSdlcSystem);
-        return projectRepository.save(project);
+				.sdlcSystem(convertSdlcSystemDtoToSdlcSystem(projectDto.getSdlcSystem())).build();
 	}
 	
-	public Project updateProject(Long projectId,ProjectDto projectDetails) {
-		return projectRepository.findById(projectId).map(project -> {
-                    project.setExternalId(projectDetails.getExternalId());
-                    project.setName(projectDetails.getName());
-                    project.setSdlcSystem(buildSdlcSystem(projectDetails));
-                    final Project updatedProject = projectRepository.save(project);
-                    return updatedProject;
-                }).orElse(null);
-        
-    }
-	private SdlcSystem buildSdlcSystem(ProjectDto projectDetails) {
-	 return SdlcSystem.builder().baseUrl(projectDetails.getSdlcSystem().getBaseUrl())
-			.description(projectDetails.getSdlcSystem().getDescription())
-			.createdDate(projectDetails.getSdlcSystem().getCreatedDate())
-			.lastModifiedDate(projectDetails.getSdlcSystem().getLastModifiedDate()).build();
-}
+	private SdlcSystem convertSdlcSystemDtoToSdlcSystem(SdlcSystemDto sdlcSystemDto) {
+		 return SdlcSystem.builder().id(sdlcSystemDto.getId()).baseUrl(sdlcSystemDto.getBaseUrl())
+				.description(sdlcSystemDto.getDescription())
+				.createdDate(sdlcSystemDto.getCreatedDate())
+				.lastModifiedDate(sdlcSystemDto.getLastModifiedDate()).build();
+	}
+	
+	private ProjectDto convertProjectToProjectDto(Project project) {
+		return ProjectDto.builder().id(project.getId()).externalId(project.getExternalId()).name(project.getName())
+				.createdDate(project.getCreatedDate()).lastModifiedDate(project.getLastModifiedDate())
+				.sdlcSystem(convertSdlcSystemToSdlcSystemDto(project.getSdlcSystem())).build();
+	}
+
+
+	private SdlcSystemDto convertSdlcSystemToSdlcSystemDto(SdlcSystem sdlcSystem) {
+		return SdlcSystemDto.builder().id(sdlcSystem.getId()).baseUrl(sdlcSystem.getBaseUrl())
+				.description(sdlcSystem.getDescription())
+				.createdDate(sdlcSystem.getCreatedDate())
+				.lastModifiedDate(sdlcSystem.getLastModifiedDate()).build();
+	}
+
+
 	
 }
