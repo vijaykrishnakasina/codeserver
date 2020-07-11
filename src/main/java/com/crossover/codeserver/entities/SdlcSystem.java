@@ -19,18 +19,19 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Setter;
 
-@Data
+//@Data
+@Getter
+@Setter
+@Builder
 @Entity
 @Table(name = "sdlc_system")
 @EntityListeners(AuditingEntityListener.class)
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@AllArgsConstructor
 public class SdlcSystem {
 
     @Id

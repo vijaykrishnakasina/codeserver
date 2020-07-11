@@ -21,18 +21,19 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Setter;
 
-@Data
+//@Data
+@Getter
+@Setter
+@Builder
 @Entity
 @Table(name = "project")
 @EntityListeners(AuditingEntityListener.class)
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Project {
 
