@@ -27,8 +27,7 @@ import io.swagger.annotations.ApiParam;
 
 @RestController
 @RequestMapping(ProjectRestController.ENDPOINT)
-@Api(produces = MediaType.APPLICATION_JSON_VALUE, tags = "Project")
-public class ProjectRestController {
+public class ProjectRestController implements ProjectControllerAPI{
 
 	public static final String ENDPOINT = "/api/v2/projects";
 	public static final String ENDPOINT_ID = "/{id}";
@@ -39,20 +38,14 @@ public class ProjectRestController {
 	@Autowired
 	private ProjectService projectService;
 
-	@ApiOperation("Get a Project")
-	@GetMapping(ENDPOINT_ID)
-	public ProjectDto getProject(
-			@ApiParam(name = API_PARAM_ID, required = true)
-			@PathVariable(PATH_VARIABLE_ID)
-			final long projectId
-	) {
+	@Override
+	public ProjectDto getProject(long projectId) {
 		return projectService.getProject(projectId);
 	}
 	
-	@ApiOperation("Insert a Project")
-	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<ProjectDto> createProject(@Valid @RequestBody ProjectDto project) {
+	
+	
+	public ResponseEntity<ProjectDto> createProject(ProjectDto project) {
 		
 		ProjectDto projectDto =  projectService.createProject(project);
 		
@@ -66,10 +59,7 @@ public class ProjectRestController {
 		
 	}
 	
-	@ApiOperation("Update a Project")
-	@PatchMapping(ENDPOINT_ID)
-	public ResponseEntity<Object> patchProject(@PathVariable(PATH_VARIABLE_ID)
-		final long projectId , @RequestBody Map<Object, Object> project) {
+	public ResponseEntity<Object> patchProject(long projectId , Map<Object, Object> project) {
 		
 		ProjectDto projectDto =  projectService.patchProject(projectId, project);
 		
