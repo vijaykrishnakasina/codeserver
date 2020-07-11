@@ -20,7 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class ControllerAdvisor extends ResponseEntityExceptionHandler {
 	
 	 @ExceptionHandler(SystemNotFoundException.class)
-	    public ResponseEntity<Object> SystemNotFoundException(
+	    public ResponseEntity<Object> systemNotFoundException(
 	    		SystemNotFoundException ex, WebRequest request) {
 	        Map<String, Object> body = new LinkedHashMap<>();
 	        body.put("timestamp", LocalDateTime.now());
@@ -29,14 +29,33 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
 	    }
 	 
 	 @ExceptionHandler(ProjectNotFoundException.class)
-	    public ResponseEntity<Object> SystemNotFoundException(
+	    public ResponseEntity<Object> projectNotFoundException(
 	    		ProjectNotFoundException ex, WebRequest request) {
 	        Map<String, Object> body = new LinkedHashMap<>();
 	        body.put("timestamp", LocalDateTime.now());
 	        body.put("message", "Project not found");
 	        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
 	    }
+	 
+	@ExceptionHandler(ConflictingDataException.class)
+	    public ResponseEntity<Object> conflictingDataException(
+	    		ConflictingDataException ex, WebRequest request) {
+	        Map<String, Object> body = new LinkedHashMap<>();
+	        body.put("timestamp", LocalDateTime.now());
+	        body.put("message", "Conflicting input data");
+	        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+	    }
+	
+	@ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> illegalArgumentException(
+    		IllegalArgumentException ex, WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", "Illegal input data");
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
 
+	
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {

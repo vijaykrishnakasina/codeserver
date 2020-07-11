@@ -21,6 +21,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,6 +37,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Project {
 
     @Id
@@ -60,4 +63,5 @@ public class Project {
     @Column(name = "last_modified_date", nullable = false)
     @LastModifiedDate
     public Instant lastModifiedDate;
+    
 }

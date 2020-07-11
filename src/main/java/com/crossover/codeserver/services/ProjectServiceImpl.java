@@ -3,6 +3,7 @@ package com.crossover.codeserver.services;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
@@ -11,6 +12,7 @@ import com.crossover.codeserver.dto.ProjectDto;
 import com.crossover.codeserver.dto.SdlcSystemDto;
 import com.crossover.codeserver.entities.Project;
 import com.crossover.codeserver.entities.SdlcSystem;
+import com.crossover.codeserver.exception.ConflictingDataException;
 import com.crossover.codeserver.exception.ProjectNotFoundException;
 import com.crossover.codeserver.exception.SystemNotFoundException;
 import com.crossover.codeserver.repositories.ProjectRepository;
@@ -46,14 +48,23 @@ public class ProjectServiceImpl implements ProjectService {
 	@Override
 	public ProjectDto createProject(ProjectDto projectDto) {
 		Project project = convertProjectDtoToProject(projectDto);
-		sdlcSystemRepository.findById(project.getSdlcSystem().getId()).orElseThrow(() -> new SystemNotFoundException(project.getSdlcSystem().getId()));
-		return convertProjectToProjectDto(projectRepository.save(project));
+		sdlcSystemRepository.findById(project.getSdlcSystem().getId()).orElseThrow(() -> new SystemNotFoundException(projectDto.getSdlcSystem().getId()));
+		
+		try {
+			project = projectRepository.save(project);
+		} catch (org.springframework.dao.DataIntegrityViolationException e) {
+			throw new ConflictingDataException();
+		}
+		
+		return convertProjectToProjectDto(project);
 	}
 	
 	@Override
 	public ProjectDto patchProject(long project_id, Map<Object, Object> projectDtoFields) {
 		
 		Project exising_project = projectRepository.findById(project_id).orElseThrow(() -> new ProjectNotFoundException(project_id));
+		
+		
 		projectDtoFields.forEach((k,v)->{
 			Field field = ReflectionUtils.findField(Project.class,(String) k);
 			if (v instanceof String) {
@@ -63,8 +74,17 @@ public class ProjectServiceImpl implements ProjectService {
 				ReflectionUtils.setField(field, exising_project, mappper.convertValue(v, field.getType()));
 			}
 		});
+		
+		sdlcSystemRepository.findById(exising_project.getSdlcSystem().getId()).orElseThrow(() -> new SystemNotFoundException(exising_project.getSdlcSystem().getId()));
+		
+		Project p = null;
+		try {
+			p = projectRepository.save(exising_project);
+		} catch (org.springframework.dao.DataIntegrityViolationException e) {
+			throw new ConflictingDataException();
+		}
 		//sdlcSystemRepository.findById(project.getSdlcSystem().getId()).orElseThrow(() -> new SystemNotFoundException(project.getSdlcSystem().getId()));
-		return convertProjectToProjectDto(exising_project);
+		return convertProjectToProjectDto(p);
 	}
 	
 	
