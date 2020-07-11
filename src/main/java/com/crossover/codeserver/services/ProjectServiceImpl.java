@@ -3,7 +3,6 @@ package com.crossover.codeserver.services;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
@@ -34,7 +33,7 @@ public class ProjectServiceImpl implements ProjectService {
 	final ObjectMapper mappper = new ObjectMapper();
 
 	public ProjectDto getProject(long id) {
-		Project project =  projectRepository.findById(id).orElseThrow(RuntimeException::new);
+		Project project =  projectRepository.findById(id).orElseThrow(() -> new ProjectNotFoundException(id));
 		return convertProjectToProjectDto(project);
 	}
 	
@@ -83,7 +82,6 @@ public class ProjectServiceImpl implements ProjectService {
 		} catch (org.springframework.dao.DataIntegrityViolationException e) {
 			throw new ConflictingDataException();
 		}
-		//sdlcSystemRepository.findById(project.getSdlcSystem().getId()).orElseThrow(() -> new SystemNotFoundException(project.getSdlcSystem().getId()));
 		return convertProjectToProjectDto(p);
 	}
 	

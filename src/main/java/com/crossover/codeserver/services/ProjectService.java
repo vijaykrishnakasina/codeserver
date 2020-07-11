@@ -2,10 +2,7 @@ package com.crossover.codeserver.services;
 
 import java.util.Map;
 
-import javax.validation.Valid;
-
 import com.crossover.codeserver.dto.ProjectDto;
-import com.crossover.codeserver.entities.Project;
 
 public interface ProjectService {
 

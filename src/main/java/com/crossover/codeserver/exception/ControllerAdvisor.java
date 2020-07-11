@@ -1,6 +1,5 @@
 package com.crossover.codeserver.exception;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.crossover.codeserver.dto.ProjectDto;
-import com.crossover.codeserver.entities.Project;
 import com.crossover.codeserver.services.ProjectService;
 
 import io.swagger.annotations.Api;
@@ -72,17 +71,8 @@ public class ProjectRestController {
 	public ResponseEntity<Object> patchProject(@PathVariable(PATH_VARIABLE_ID)
 		final long projectId , @RequestBody Map<Object, Object> project) {
 		
-		
-		
 		ProjectDto projectDto =  projectService.patchProject(projectId, project);
 		
-		URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(projectDto.getId())
-                .toUri();
-		
-		//return ResponseEntity.created(location).body(projectDto);
 		return new ResponseEntity<>(projectDto, HttpStatus.OK);
 		
 	}
