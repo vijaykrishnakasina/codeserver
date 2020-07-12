@@ -30,7 +30,7 @@ public interface ProjectControllerAPI {
 
 	@ApiOperation("Get a Project")
 	@GetMapping(ENDPOINT_ID)
-	ProjectDto getProject(@ApiParam(name = API_PARAM_ID, required = true) @PathVariable(PATH_VARIABLE_ID) final long projectId);
+	ProjectDto getProject(@ApiParam(name = API_PARAM_ID, required = true)  @PathVariable(value = PATH_VARIABLE_ID, required = true) final Long projectId);
 	
 	@ApiOperation("Insert a Project")
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
@@ -38,5 +38,5 @@ public interface ProjectControllerAPI {
 
 	@ApiOperation("Update a Project")
 	@PatchMapping(ENDPOINT_ID)
-	public ResponseEntity<Object> patchProject(@PathVariable(PATH_VARIABLE_ID) final long projectId ,@Valid @RequestBody Map<Object, Object> project);
+	public ResponseEntity<Object> patchProject(@PathVariable(value = PATH_VARIABLE_ID, required = true) final Long projectId ,@Valid @RequestBody Map<Object, Object> project);
 }

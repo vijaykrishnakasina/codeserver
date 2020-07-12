@@ -25,12 +25,12 @@ public class ProjectRestController implements ProjectControllerAPI{
 	private ProjectService projectService;
 
 	@Override
-	public ProjectDto getProject(long projectId) {
+	public ProjectDto getProject(Long projectId) {
 		return projectService.getProject(projectId);
 	}
 	
 	
-	
+	@Override
 	public ResponseEntity<ProjectDto> createProject(ProjectDto project) {
 		
 		ProjectDto projectDto =  projectService.createProject(project);
@@ -45,7 +45,8 @@ public class ProjectRestController implements ProjectControllerAPI{
 		
 	}
 	
-	public ResponseEntity<Object> patchProject(long projectId , Map<Object, Object> project) {
+	@Override
+	public ResponseEntity<Object> patchProject(Long projectId , Map<Object, Object> project) {
 		
 		ProjectDto projectDto =  projectService.patchProject(projectId, project);
 		

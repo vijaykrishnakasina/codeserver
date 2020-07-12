@@ -46,6 +46,7 @@ public class CodeServerDAOImpl implements CodeServerDAO {
 		if (project == null || project.getSdlcSystem() == null || project.getSdlcSystem().getId() == null) {
 			throw new IllegalArgumentException();
 		}
+		
 		Long project_id = project.getId();
 		Long sys_id = project.getSdlcSystem().getId();
 		
